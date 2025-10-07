@@ -1,14 +1,10 @@
 #include <iostream>
-#include <GLFW/glfw3.h>
+#include "Application.hpp"
 
 int main()
 {
-    if (!glfwInit())
-    {
-        std::cerr << "Failed to initialize GLFW" << std::endl;
-        return -1;
-    }
-    std::cout << "Hello, world" << std::endl;
-
-    return 0;
+    Core::Application app(/*width*/800, /*height*/600);
+    app.init();
+    
+    return app.run();
 }
