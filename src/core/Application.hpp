@@ -3,7 +3,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <vector>
-#include "Renderable.hpp"
+#include <memory>
+#include "ModelRenderable.hpp"
 #include "Shader.hpp"
 
 namespace Core {
@@ -32,7 +33,7 @@ private:
     int WIDTH;
     int HEIGHT;
 
-    std::vector<Renderable> renderables;
+    std::vector<std::unique_ptr<Renderable>> renderables;
 };
 
 } // Core namespace
