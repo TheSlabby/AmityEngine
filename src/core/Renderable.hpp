@@ -14,10 +14,10 @@ class Renderable
 public:
     Renderable(std::shared_ptr<Shader> shader);
 
-    void render(double dt) const;
+    virtual void render(double dt) const;
 
-private:
-    GLuint VAO, VBO, EBO;
+protected:
+    // GLuint VAO, VBO, EBO;
     std::shared_ptr<Shader> m_shader;
     mutable glm::mat4 m_model;
 };

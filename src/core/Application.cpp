@@ -43,14 +43,14 @@ void Application::init()
     auto shader = std::make_shared<Shader>();
     shader->setShader("shaders/vert.glsl", "shaders/frag.glsl"); // TODO figure out paths better (so it works on windows too)
     shader->use();
-    glm::mat4 projection = glm::perspective(glm::radians(90.0f), (800.0f / 600.0f), 0.1f, 100.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(90.0f), (800.0f / 600.0f), 0.1f, 1000.0f);
     shader->setMat4("u_Proj", projection);
     glm::mat4 view = glm::mat4(1.0f);
     view = glm::inverse(glm::translate(view, glm::vec3(0.0f, -1.0f, 5.0f)));
     shader->setMat4("u_View", view);
 
     // test init
-    renderables.emplace_back(shader);
+    renderables.push_back(std::make_unique<ModelRenderable>("/home/wmcgilvary/drone.obj", shader));
 }
 
 int Application::run()
@@ -65,9 +65,9 @@ int Application::run()
         update(dt);
 
         // draw renderables
-        for (const Renderable& renderable : renderables)
+        for (const auto& renderable : renderables)
         {
-            renderable.render(dt);
+            renderable->render(dt);
         }
 
         glfwSwapBuffers(m_window);

@@ -10,12 +10,14 @@ add_executable(Amity
     src/core/Application.cpp
     src/core/Renderable.cpp
     src/core/Shader.cpp
+    src/core/ModelRenderable.cpp
 )
 
 # opengl packages
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
+find_package(assimp REQUIRED)
 
 #glad
 add_library(glad STATIC src/third_party/glad/glad.c)
@@ -38,4 +40,5 @@ target_link_libraries(Amity PRIVATE
     OpenGL::GL
     glad
     glm::glm
+    assimp
 )
