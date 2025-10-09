@@ -4,19 +4,26 @@ namespace Core {
 
 Sound::Sound(const std::string& path) {
     SF_INFO sfinfo;
-    SNDFILE* sndfile = sf_open(path.c_str(), SFM_READ, &sfinfo);
+    SNDFILE* sndfile = sf_open(path.c_str(), SFM_READ, &sfinfo); // TODO do RAII so we can close if something fails in the middle
 
     if (!sndfile)
-        std::cerr << "couldnt load audio file: " << path << std::endl;
-    
-    std::vector<short> audioData(sfinfo.frames * sfinfo.channels);
-    sf_readf_short(sndfile, audioData.data(), sfinfo.frames);
-    sf_close(sndfile);
+    {
+        std::cerr << "SOUND ERROR: Couldn't load audio file: " << path << std::endl;
+        m_valid = false;
+    }
+    else
+    {
+        // successfully loaded file, load data to buffer
+        std::vector<short> audioData(sfinfo.frames * sfinfo.channels);
 
-    setup(audioData, sfinfo.channels, sfinfo.samplerate);
+        sf_readf_short(sndfile, audioData.data(), sfinfo.frames);
+        m_valid = setup(audioData, sfinfo.channels, sfinfo.samplerate);
+    }
+
+    sf_close(sndfile);
 }
 
-void Sound::setup(const std::vector<short>& audioData, int channels, int sampleRate)
+bool Sound::setup(const std::vector<short>& audioData, int channels, int sampleRate)
 {
     ALenum format;
     if (channels == 1)
@@ -26,7 +33,7 @@ void Sound::setup(const std::vector<short>& audioData, int channels, int sampleR
     else
     {
         std::cerr << "unsupported num audio channels: " << channels << std::endl;
-        return;
+        return false;
     }
 
     alGenBuffers(1, &buffer);
@@ -34,6 +41,8 @@ void Sound::setup(const std::vector<short>& audioData, int channels, int sampleR
     
     alGenSources(1, &source);
     alSourcei(source, AL_BUFFER, buffer);
+
+    return true;
 
 }
 

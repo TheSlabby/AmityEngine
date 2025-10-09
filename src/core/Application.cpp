@@ -27,9 +27,6 @@ Application::Application(int width, int height) : WIDTH(width), HEIGHT(height), 
     context = alcCreateContext(device, nullptr);
     if (!alcMakeContextCurrent(context)) throw std::runtime_error("Can't make device context current");
 
-    std::cout << "audio setup" << std::endl;
-
-
 
     // glad init
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))

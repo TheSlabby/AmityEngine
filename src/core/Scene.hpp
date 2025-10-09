@@ -2,6 +2,7 @@
 #include "Camera.hpp"
 #include "Renderable.hpp"
 #include <AL/al.h>
+#include <vector>
 
 namespace Core {
 

@@ -9,8 +9,11 @@ TestGame::TestGame() : Application(1280, 720), m_music("../../soundAssets/ItWont
 void TestGame::init()
 {
     // MUSIC
-    m_music.setLooping(true);
-    m_music.play();
+    if (m_music.valid())
+    {
+        m_music.setLooping(true);
+        m_music.play();
+    }
 
     // TESTING CODE
     auto shader = std::make_shared<Shader>();

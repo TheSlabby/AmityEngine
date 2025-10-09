@@ -19,10 +19,13 @@ public:
     void setPosition(float x, float y, float z) { alSource3f(source, AL_POSITION, x, y, z); }
     void setVelocity(float x, float y, float z) { alSource3f(source, AL_VELOCITY, x, y, z); }
 
+    bool valid() { return m_valid; }
+
 private:
-    void setup(const std::vector<short>& audioData, int channels, int sampleRate);
+    bool setup(const std::vector<short>& audioData, int channels, int sampleRate);
     ALuint buffer = 0;
     ALuint source = 0;
+    bool m_valid = true;
 };
 
 }
