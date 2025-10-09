@@ -2,6 +2,8 @@
 #include "Renderable.hpp"
 #include <vector>
 #include <glad/glad.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <memory>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -10,34 +12,25 @@
 
 namespace Core {
 
-// structs
-struct Vertex
-{
-    glm::vec3 Position;
-    glm::vec3 Normal;
-    glm::vec2 TexCoords;
-};
-struct Texture
-{
-    unsigned int id;
-    std::string type;
-};
-
 
 // MESH CLASS
 class Mesh
 {
 public:
-    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures)
-        : vertices(vertices), indices(indices), textures(textures)
+    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures, glm::vec4 materialColor)
+        : vertices(vertices), indices(indices), textures(textures), materialColor(materialColor)
     {
         setupMesh();
     }
     void draw();
+
+    glm::vec4 getMaterialColor() const { return materialColor; }
+
 private:
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
     std::vector<Texture> textures;
+    glm::vec4 materialColor;
 
     GLuint VAO, VBO, EBO;
 
@@ -47,19 +40,32 @@ private:
 
 
 
+
+// MODEL CONFIG
+struct ModelConfig
+{
+    std::string modelPath;
+    float scale {1.0f};
+    float brightness {1.0f};
+};
 // MODEL RENDERABLE 
 class ModelRenderable : public Renderable
 {
 public:
-    ModelRenderable(const std::string& modelPath, std::shared_ptr<Shader> shader);
-    void render(double dt) const override;
+    ModelRenderable(const ModelConfig& modelConfig, std::shared_ptr<Shader> shader);
+    void render(const Scene& scene, double dt) override;
 
 
 private:
     std::vector<std::unique_ptr<Mesh>> meshes;
     void processNode(aiNode *node, const aiScene *scene);
-    void loadModel(const std::string& path);
+    void loadModel();
+    std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, const std::string& typeName, const aiScene* scene);
     std::unique_ptr<Mesh> processMesh(aiMesh *mesh, const aiScene *scene);
+    ModelConfig m_config;
+
+    Assimp::Importer m_importer;
+    std::vector<Texture> texturesLoaded; // cache textures
 };
 
     
