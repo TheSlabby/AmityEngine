@@ -20,6 +20,17 @@ Application::Application(int width, int height) : WIDTH(width), HEIGHT(height), 
 
     glfwMakeContextCurrent(m_window);
 
+
+    // openAL SETUP
+    device = alcOpenDevice(nullptr);
+    if (!device) throw std::runtime_error("No audio device");
+    context = alcCreateContext(device, nullptr);
+    if (!alcMakeContextCurrent(context)) throw std::runtime_error("Can't make device context current");
+
+    std::cout << "audio setup" << std::endl;
+
+
+
     // glad init
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -30,8 +41,12 @@ Application::Application(int width, int height) : WIDTH(width), HEIGHT(height), 
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
-    // glDepthFunc(GL_LESS); // default; passes if the incoming depth value is less than the stored one
 
+    // resize callback
+    glfwSetWindowUserPointer(m_window, this);
+    glfwSetWindowSizeCallback(m_window, Application::onResizeCallback);
+
+    setupProjectionMatrix();
 
 }
 
@@ -40,8 +55,34 @@ Application::~Application()
     // cleanup
     glfwDestroyWindow(m_window);
     glfwTerminate();
+
+    // openAL cleanup
+    alcMakeContextCurrent(nullptr);
+    alcDestroyContext(context);
+    alcCloseDevice(device);
 }
 
+
+// RESIZING
+void Application::onResizeCallback(GLFWwindow* window, int width, int height)
+{
+    Application* app = static_cast<Application*>(glfwGetWindowUserPointer(window));
+    if (app)
+        app->onResize(window, width, height);
+}
+void Application::onResize(GLFWwindow* window, int width, int height)
+{
+    WIDTH = width;
+    HEIGHT = height;
+    glViewport(0, 0, WIDTH, HEIGHT);
+    setupProjectionMatrix();
+}
+
+void Application::setupProjectionMatrix()
+{
+    m_projection = glm::perspective(glm::radians(90.0f), (static_cast<float>(WIDTH) / HEIGHT), 0.1f, 5000.0f);
+    m_scene.setProjectionMatrix(m_projection);
+}
 
 int Application::run()
 {

@@ -10,4 +10,7 @@ public:
 
     void init() override;
     void update(double dt) override;
+
+private:
+    Sound m_music;
 };

@@ -14,6 +14,7 @@ add_executable(Amity
     src/core/TerrainRenderable.cpp
     src/core/Scene.cpp
     src/core/Camera.cpp
+    src/core/Sound.cpp
 )
 
 include_directories(src/core)
@@ -24,6 +25,8 @@ find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
 find_package(assimp REQUIRED)
 find_package(Stb REQUIRED)
+find_package(OpenAL REQUIRED)
+find_package(SndFile REQUIRED)
 
 #glad
 add_library(glad STATIC src/third_party/glad/glad.c)
@@ -47,4 +50,6 @@ target_link_libraries(Amity PRIVATE
     glad
     glm::glm
     assimp::assimp
+    OpenAL::OpenAL
+    SndFile::sndfile
 )

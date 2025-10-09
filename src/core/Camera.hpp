@@ -20,6 +20,7 @@ public:
     // getters
     glm::mat4 getView() const;
     glm::vec3 getPosition() const { return m_pos; }
+    glm::vec3 forwardVector() const;
 
 private:
     glm::vec3 m_pos{0.0f};

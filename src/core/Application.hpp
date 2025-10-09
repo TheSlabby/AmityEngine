@@ -8,6 +8,9 @@
 #include "TerrainRenderable.hpp"
 #include "Shader.hpp"
 #include "Scene.hpp"
+#include "Sound.hpp"
+#include <AL/al.h>
+#include <AL/alc.h>
 
 namespace Core {
 
@@ -30,6 +33,9 @@ protected:
     std::string m_appName{"Engine Core"};
     glm::vec4 m_clearColor{0.1f, 0.1f, 0.1f, 1.0f};
 
+    void setupProjectionMatrix();
+    glm::mat4 m_projection;
+
     GLFWwindow* m_window;
 
     double m_lastFrameTime;
@@ -41,6 +47,13 @@ protected:
     int HEIGHT;
     
     double m_runTime { 0.0 };
+
+    ALCdevice* device;
+    ALCcontext* context;
+
+    // resize callback
+    static void onResizeCallback(GLFWwindow* window, int width, int height);
+    void onResize(GLFWwindow* window, int width, int height);
 
 };
 
