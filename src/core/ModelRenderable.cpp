@@ -250,7 +250,8 @@ void ModelRenderable::render(const Scene& scene, double dt)
     // m_model = glm::rotate(m_model, static_cast<float>(dt), glm::vec3(0.0f, 1.0f, 0.0f));
     m_shader->use();
     m_shader->setMat4("u_Model", m_model);
-    m_shader->setMat4("m_View", scene.getView());
+    m_shader->setMat4("u_View", scene.getView());
+    m_shader->setMat4("u_Proj", scene.getProjection()); // TODO setting view & projection can be redundant cus shaders can be reused across renderables
     for (const auto& mesh : meshes)
     {
         // std::cout << "material color: " << mesh->getMaterialColor().y << std::endl;

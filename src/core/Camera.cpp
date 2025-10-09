@@ -27,4 +27,9 @@ glm::mat4 Camera::getView() const
     return view;
 }
 
+glm::vec3 Camera::forwardVector() const
+{
+    return -m_rotation[2];
+}
+
 }

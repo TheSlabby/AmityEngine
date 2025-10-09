@@ -69,6 +69,7 @@ namespace Core
         m_shader->use();
         m_shader->setMat4("u_Model", m_model);
         m_shader->setMat4("u_View", scene.getView());
+        m_shader->setMat4("u_Proj", scene.getProjection());
         m_shader->setVec4("u_MaterialColor", m_terrainSettings.baseColor);
         glBindVertexArray(VAO);
         // glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);

@@ -1,14 +1,16 @@
 #include "TestGame.hpp"
 
 
-TestGame::TestGame() : Application(1280, 720)
+TestGame::TestGame() : Application(1280, 720), m_music("../../soundAssets/ItWontStopRainingHere.ogg")
 {
     m_appName = "Test Game";
 }
 
 void TestGame::init()
 {
-    std::cout << "app specific init" << std::endl;
+    // MUSIC
+    m_music.setLooping(true);
+    m_music.play();
 
     // TESTING CODE
     auto shader = std::make_shared<Shader>();
@@ -24,11 +26,6 @@ void TestGame::init()
 
     // set shaders
     shader->setShader("shaders/vert.glsl", "shaders/frag.glsl"); // TODO figure out paths better (so it works on windows too)
-
-    // setup projection
-    shader->use();
-    glm::mat4 projection = glm::perspective(glm::radians(90.0f), (static_cast<float>(WIDTH) / HEIGHT), 0.1f, 5000.0f);
-    shader->setMat4("u_Proj", projection);
 
     // initial cam test pos
     m_scene.getCamera().moveTo(glm::vec3(0.0f, 200.0f, 500.0f));
