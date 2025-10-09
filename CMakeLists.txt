@@ -6,18 +6,24 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_executable(Amity
-    src/core/main.cpp
+    src/app/main.cpp
+    src/app/TestGame.cpp
     src/core/Application.cpp
-    src/core/Renderable.cpp
     src/core/Shader.cpp
     src/core/ModelRenderable.cpp
+    src/core/TerrainRenderable.cpp
+    src/core/Scene.cpp
+    src/core/Camera.cpp
 )
+
+include_directories(src/core)
 
 # opengl packages
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
 find_package(assimp REQUIRED)
+find_package(Stb REQUIRED)
 
 #glad
 add_library(glad STATIC src/third_party/glad/glad.c)
@@ -40,5 +46,5 @@ target_link_libraries(Amity PRIVATE
     OpenGL::GL
     glad
     glm::glm
-    assimp
+    assimp::assimp
 )

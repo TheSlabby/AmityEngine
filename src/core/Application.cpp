@@ -8,8 +8,10 @@ Application::Application(int width, int height) : WIDTH(width), HEIGHT(height), 
     {
         std::cerr << "Failed to initialize GLFW" << std::endl;
     }
+    
+    m_startTime = glfwGetTime();
 
-    m_window = glfwCreateWindow(WIDTH, HEIGHT, "AmityEngine", nullptr, nullptr);
+    m_window = glfwCreateWindow(WIDTH, HEIGHT, m_appName.c_str(), nullptr, nullptr);
     if (!m_window)
     {
         std::cerr << "Couldn't create window :(" << std::endl;
@@ -26,6 +28,11 @@ Application::Application(int width, int height) : WIDTH(width), HEIGHT(height), 
 
     glViewport(0, 0, WIDTH, HEIGHT);
 
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    // glDepthFunc(GL_LESS); // default; passes if the incoming depth value is less than the stored one
+
+
 }
 
 Application::~Application()
@@ -35,23 +42,6 @@ Application::~Application()
     glfwTerminate();
 }
 
-void Application::init()
-{
-    std::cout << "app specific init" << std::endl;
-
-    // TESTING CODE
-    auto shader = std::make_shared<Shader>();
-    shader->setShader("shaders/vert.glsl", "shaders/frag.glsl"); // TODO figure out paths better (so it works on windows too)
-    shader->use();
-    glm::mat4 projection = glm::perspective(glm::radians(90.0f), (800.0f / 600.0f), 0.1f, 1000.0f);
-    shader->setMat4("u_Proj", projection);
-    glm::mat4 view = glm::mat4(1.0f);
-    view = glm::inverse(glm::translate(view, glm::vec3(0.0f, -1.0f, 5.0f)));
-    shader->setMat4("u_View", view);
-
-    // test init
-    renderables.push_back(std::make_unique<ModelRenderable>("/home/wmcgilvary/drone.obj", shader));
-}
 
 int Application::run()
 {
@@ -61,14 +51,16 @@ int Application::run()
         double t = glfwGetTime();
         double dt = t - m_lastFrameTime;
         m_lastFrameTime = t;
+        m_runTime = t - m_startTime;
 
+        // update (maybe move this to separate timer later)
+        m_scene.update(dt);
         update(dt);
 
-        // draw renderables
-        for (const auto& renderable : renderables)
-        {
-            renderable->render(dt);
-        }
+        // RENDER
+        glClearColor(m_clearColor.r, m_clearColor.g, m_clearColor.b, m_clearColor.a);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        m_scene.render(dt);
 
         glfwSwapBuffers(m_window);
         glfwPollEvents();
@@ -77,11 +69,6 @@ int Application::run()
     return 0;
 }
 
-void Application::update(double dt)
-{
-    glClearColor(0.1, 0.1, 0.1,  1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-}
 
 
 } // Core namespace

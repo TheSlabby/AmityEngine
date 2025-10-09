@@ -5,7 +5,9 @@
 #include <vector>
 #include <memory>
 #include "ModelRenderable.hpp"
+#include "TerrainRenderable.hpp"
 #include "Shader.hpp"
+#include "Scene.hpp"
 
 namespace Core {
 
@@ -15,25 +17,31 @@ public:
     Application(int width, int height);
     ~Application();
 
-    virtual void init();
+    virtual void init() = 0;
 
     int getWidth() { return WIDTH; }
     int getHeight() { return HEIGHT; }
 
     int run();
 
-    virtual void update(double dt);
+    virtual void update(double dt) = 0;
 
-private:
+protected:
+    std::string m_appName{"Engine Core"};
+    glm::vec4 m_clearColor{0.1f, 0.1f, 0.1f, 1.0f};
+
     GLFWwindow* m_window;
 
     double m_lastFrameTime;
+    double m_startTime;
 
-    // private constants
+    Scene m_scene;
+
     int WIDTH;
     int HEIGHT;
+    
+    double m_runTime { 0.0 };
 
-    std::vector<std::unique_ptr<Renderable>> renderables;
 };
 
 } // Core namespace

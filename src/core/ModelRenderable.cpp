@@ -1,6 +1,61 @@
 #include "ModelRenderable.hpp"
 
+// STB IMAGE
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
+
+
+// NEW: Helper function to load an embedded texture from a memory buffer
+// unsigned int TextureFromMemory(const aiTexture* embeddedTexture)
+// {
+//     std::cout << "loading texutre from memory: " << embeddedTexture << std::endl;
+//     unsigned int textureID;
+//     glGenTextures(1, &textureID);
+
+//     int width, height, nrComponents;
+//     // Assimp stores compressed data (like a full PNG) in pcData.
+//     // mWidth is the size of this data in bytes. mHeight is 0 for compressed.
+//     unsigned char* data = stbi_load_from_memory(
+//         reinterpret_cast<const stbi_uc*>(embeddedTexture->pcData),
+//         embeddedTexture->mWidth,
+//         &width, &height, &nrComponents, 0
+//     );
+
+//     if (data)
+//     {
+//         GLenum format;
+//         if (nrComponents == 1)
+//             format = GL_RED;
+//         else if (nrComponents == 3)
+//             format = GL_RGB;
+//         else if (nrComponents == 4)
+//             format = GL_RGBA;
+
+//         glBindTexture(GL_TEXTURE_2D, textureID);
+//         glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+//         glGenerateMipmap(GL_TEXTURE_2D);
+
+//         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+//         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+//         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+//         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+//         stbi_image_free(data);
+//     }
+//     else
+//     {
+//         std::cerr << "Failed to load embedded texture." << std::endl;
+//         stbi_image_free(data);
+//     }
+
+//     return textureID;
+// }
+
+
+
 namespace Core {
+
 
 // MESH
 void Mesh::setupMesh()
@@ -38,20 +93,23 @@ void Mesh::draw()
 // END MESH
 
 
-ModelRenderable::ModelRenderable(const std::string& modelPath, std::shared_ptr<Shader> shader) : Renderable(shader)
+
+
+// BEGIN MODELRENDERABLE
+ModelRenderable::ModelRenderable(const ModelConfig& modelConfig, std::shared_ptr<Shader> shader) : Renderable(shader), m_config(modelConfig)
 {
-    m_model = glm::scale(m_model, glm::vec3(0.001f));
-    loadModel(modelPath);
+    // m_model = glm::translate(m_model, glm::vec3(0, 200, 0));
+    m_model = glm::scale(m_model, glm::vec3(modelConfig.scale));
+    loadModel();
 }
 
-void ModelRenderable::loadModel(const std::string& path)
+void ModelRenderable::loadModel()
 {
-    Assimp::Importer import;
-    const aiScene *scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+    const aiScene* scene = m_importer.ReadFile(m_config.modelPath, aiProcess_Triangulate | aiProcess_FlipUVs);
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
-        std::cerr << "ASSIMP ERROR: " << import.GetErrorString() << std::endl;
+        std::cerr << "ASSIMP ERROR: " << m_importer.GetErrorString() << std::endl;
         return;
     }
 
@@ -74,8 +132,9 @@ void ModelRenderable::processNode(aiNode *node, const aiScene *scene)
     }
 }
 
-std::unique_ptr<Mesh> ModelRenderable::processMesh(aiMesh *mesh, const aiScene* scene)
+std::unique_ptr<Mesh> ModelRenderable::processMesh(aiMesh *mesh, const aiScene *scene)
 {
+    glm::vec4 materialColor(1.0f);
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
     std::vector<Texture> textures;
@@ -116,15 +175,86 @@ std::unique_ptr<Mesh> ModelRenderable::processMesh(aiMesh *mesh, const aiScene* 
         }
     }
 
-    return std::make_unique<Mesh>(vertices, indices, textures);
+    // process materials
+    if (mesh->mMaterialIndex >= 0)
+    {
+        aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+
+        // check base color
+        aiColor4D diffuseColor;
+        if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &diffuseColor))
+        {
+            materialColor = glm::vec4(diffuseColor.r, diffuseColor.g, diffuseColor.b, diffuseColor.a) * m_config.brightness;
+        }
+
+        // color maps
+        // std::vector<Texture> baseColorMaps = loadMaterialTextures(material, aiTextureType_BASE_COLOR, "texture_basecolor", scene);
+        // textures.insert(textures.end(), baseColorMaps.begin(), baseColorMaps.end());;
+        // difuse maps
+        std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse", scene);
+        textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end()); // append diffsueMaps to txturse
+        // specular maps
+        std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular", scene);
+        textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+    }
+
+    return std::make_unique<Mesh>(vertices, indices, textures, materialColor);
 }
 
-void ModelRenderable::render(double dt) const
+std::vector<Texture> ModelRenderable::loadMaterialTextures(aiMaterial* mat, aiTextureType type, const std::string& typeName, const aiScene* scene)
 {
+    std::vector<Texture> textures;
+    // std::cout << "texture count: " << mat->GetTextureCount(type) << std::endl;
+    for (unsigned int i = 0; i < mat->GetTextureCount(type); ++i)
+    {
+        aiString str;
+        mat->GetTexture(type, i, &str);
+
+        // check if texture was laoded to prevent duplicates
+        bool skip = false;
+        for (unsigned int j = 0; j < texturesLoaded.size(); ++j)
+        {
+            if (std::strcmp(texturesLoaded[j].path.data(), str.C_Str()) == 0)
+            {
+                textures.push_back(texturesLoaded[j]);
+                skip = true;
+                break;
+            }
+        }
+
+        if (!skip)
+        {
+            Texture texture;
+            const aiTexture* embeddedTexture = scene->GetEmbeddedTexture(str.C_Str());
+            if (embeddedTexture != nullptr)
+            {
+                // embedded texture
+                // texture.id = TextureFromMemory(embeddedTexture); // TODO implement this
+            }
+            // TODO texture from file
+
+            texture.type = typeName;
+            texture.path = str.C_Str();
+            textures.push_back(texture);
+            texturesLoaded.push_back(texture);
+        }
+    }
+
+    return textures;
+}
+
+
+
+void ModelRenderable::render(const Scene& scene, double dt)
+{
+    // m_model = glm::rotate(m_model, static_cast<float>(dt), glm::vec3(0.0f, 1.0f, 0.0f));
     m_shader->use();
     m_shader->setMat4("u_Model", m_model);
+    m_shader->setMat4("m_View", scene.getView());
     for (const auto& mesh : meshes)
     {
+        // std::cout << "material color: " << mesh->getMaterialColor().y << std::endl;
+        m_shader->setVec4("u_MaterialColor", mesh->getMaterialColor());
         mesh->draw();
     }
 }
