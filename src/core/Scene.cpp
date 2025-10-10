@@ -4,11 +4,19 @@ namespace Core {
 
 void Scene::render(double dt)
 {
-    // uniforms
-
+    // render renderables
     for (const auto& renderable : m_renderables)
     {
         renderable->render(*this, dt);
+    }
+
+    // entities
+    for (const auto& entity : m_entities)
+    {
+        // update entity 
+        entity->translate(entity->getVelocity() * static_cast<float>(dt));
+
+        entity->render(*this, dt);
     }
 }
 
