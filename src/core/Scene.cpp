@@ -4,6 +4,11 @@
 
 namespace Core {
 
+Scene::Scene()
+{
+
+}
+
 Scene::~Scene()
 {
     if (glfwGetCurrentContext()) { // if using GLFW
@@ -38,13 +43,21 @@ void Scene::setupFramebuffer()
         std::cerr << "ERROR: Framebuffer not complete!" << std::endl;
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    // setup quad for postprocessing
+    setupScreenQuad();
+    m_postProcessShader.setShader("shaders/postprocessVert.glsl", "shaders/postprocessFrag.glsl");
+
 }
 
 
 void Scene::render(double dt)
 {
     // RENDER TO FRAMEBUFFER
-    // glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+    glEnable(GL_DEPTH_TEST);
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // render renderables (if not in entity, probably just a static render (like terrain player doesnt interact with))
     for (const auto& renderable : m_renderables)
@@ -58,8 +71,35 @@ void Scene::render(double dt)
         entity->render(*this, dt);
     }
 
+
+    // POST PROCESSING
     // unbind fbo
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDisable(GL_DEPTH_TEST);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    m_postProcessShader.use();
+    m_postProcessShader.setInt("screenTexture", 0);
+    glBindVertexArray(m_quadVAO);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_colorTexture);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+void Scene::setupScreenQuad()
+{
+    glGenVertexArrays(1, &m_quadVAO);
+    glGenBuffers(1, &m_quadVBO);
+    glBindVertexArray(m_quadVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, m_quadVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+    // position atrib
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+    // texture atrib
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 }
 
 void Scene::update(double dt)
