@@ -41,10 +41,10 @@ protected:
     double m_lastFrameTime;
     double m_startTime;
 
-    Scene m_scene;
-
     int WIDTH;
     int HEIGHT;
+    Scene m_scene; // must come after width/height because its constructed bsaed on these values
+
     
     double m_runTime { 0.0 };
 

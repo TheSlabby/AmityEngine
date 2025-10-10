@@ -34,12 +34,15 @@ public:
     Renderable(std::shared_ptr<Shader> shader) : m_shader(shader) { m_shader->setMat4("u_Model", m_model); }
     virtual void render(const Scene& scene, double dt) = 0;
 
+    float getScale() const { return m_scale; }
+
     void setModelMatrix(const glm::mat4& mat) { m_model = mat; }
     glm::mat4 getModelMatrix() const { return m_model; }
 
 protected:
     glm::mat4 m_model{1.0f};
     std::shared_ptr<Shader> m_shader;
+    float m_scale{1.0f};
 };
 
 }
