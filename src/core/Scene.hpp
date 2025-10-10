@@ -14,6 +14,7 @@ class Entity;
 class Scene
 {
 public:
+    Scene();
     ~Scene();
 
     // render loop
@@ -40,6 +41,13 @@ private:
     std::vector<std::shared_ptr<Renderable>> m_renderables;
     std::vector<std::shared_ptr<Entity>> m_entities;
     Camera m_camera;
+
+
+    // POST PROCESSING
+    GLuint m_quadVAO, m_quadVBO;
+    Shader m_postProcessShader; 
+    void setupScreenQuad();
+
 
 
     GLuint m_fbo{0};
