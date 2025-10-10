@@ -24,6 +24,13 @@ void TestGame::init()
     treeModel->setModelMatrix(glm::translate(treeModel->getModelMatrix(), glm::vec3(0.0, 10.0f, 0)));
     m_scene.addRenderable(treeModel);
 
+    // golf ball
+    auto ballModel = std::make_shared<ModelRenderable>(ModelConfig{"C:/Users/walke/Desktop/Dev/AmityEngine/LowPolyAssets/GolfBall.glb", 1.0f, 1.0f}, shader);
+    auto ballEntity = std::make_shared<Entity>();
+    ballEntity->setVelocity({0.0f, 5.0f, 0.0f});
+    ballEntity->setRenderable(ballModel);
+    m_scene.addEntity(ballEntity);
+
     // terrain
     m_scene.addRenderable(std::make_shared<TerrainRenderable>(TerrainSettings{}, shader));
 
