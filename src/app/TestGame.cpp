@@ -1,5 +1,5 @@
 #include "TestGame.hpp"
-
+#include <CollisionEntity.hpp>
 
 TestGame::TestGame() : Application(1280, 720), m_music("../../soundAssets/ItWontStopRainingHere.ogg")
 {
@@ -26,8 +26,9 @@ void TestGame::init()
 
     // golf ball
     auto ballModel = std::make_shared<ModelRenderable>(ModelConfig{"C:/Users/walke/Desktop/Dev/AmityEngine/LowPolyAssets/GolfBall.glb", 1.0f, 1.0f}, shader);
-    auto ballEntity = std::make_shared<Entity>();
-    ballEntity->setVelocity({0.0f, 5.0f, 0.0f});
+    auto ballEntity = std::make_shared<CollisionEntity>();
+    ballEntity->setVelocity({0.0f, 50.0f, 0.0f});
+    ballEntity->setForce({0.0f, -10.0f, 0.0f});
     ballEntity->setRenderable(ballModel);
     m_scene.addEntity(ballEntity);
 

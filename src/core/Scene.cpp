@@ -1,10 +1,11 @@
 #include "Scene.hpp"
+#include "CollisionEntity.hpp"
 
 namespace Core {
 
 void Scene::render(double dt)
 {
-    // render renderables
+    // render renderables (if not in entity, probably just a static render (like terrain player doesnt interact with))
     for (const auto& renderable : m_renderables)
     {
         renderable->render(*this, dt);
@@ -13,9 +14,6 @@ void Scene::render(double dt)
     // entities
     for (const auto& entity : m_entities)
     {
-        // update entity 
-        entity->translate(entity->getVelocity() * static_cast<float>(dt));
-
         entity->render(*this, dt);
     }
 }
@@ -31,6 +29,22 @@ void Scene::update(double dt)
     };
     alListenerfv(AL_ORIENTATION, listenerOrientation);
     alListener3f(AL_POSITION, pos.x, pos.y, pos.z);
+
+    // update entities
+    for (const auto& entity : m_entities)
+    {
+        // velocity
+        entity->translate(entity->getVelocity() * static_cast<float>(dt));
+        // force (acceleration)
+        entity->setVelocity(entity->getVelocity() + entity->getForce() * static_cast<float>(dt));
+
+
+        // perform physics operations
+        if (auto physicsEntity = std::dynamic_pointer_cast<CollisionEntity>(entity))
+        {
+            // TODO physics
+        }
+    }
 
 }
 
