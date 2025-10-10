@@ -25,16 +25,16 @@ void TestGame::init()
     m_scene.addRenderable(treeModel);
 
     // golf ball
-    auto ballModel = std::make_shared<ModelRenderable>(ModelConfig{"C:/Users/walke/Desktop/Dev/AmityEngine/LowPolyAssets/GolfBall.glb", 1.0f, 1.0f}, shader);
+    auto ballModel = std::make_shared<ModelRenderable>(ModelConfig{"C:/Users/walke/Desktop/Dev/AmityEngine/LowPolyAssets/GolfBall.glb", 0.5f, 1.0f}, shader);
     auto ballEntity = std::make_shared<CollisionEntity>();
     ballEntity->setVelocity({0.0f, 50.0f, 0.0f});
     ballEntity->setForce({0.0f, -10.0f, 0.0f});
     ballEntity->setRenderable(ballModel);
     m_scene.addEntity(ballEntity);
 
-    auto droneModel = std::make_shared<ModelRenderable>(ModelConfig{"/home/wmcgilvary/drone_dji.obj", 0.5f, 1.0f}, shader);
-    auto droneEntity = std::make_shared<CollisionEntity>();
-    droneEntity->setRenderable(droneModel);
+    auto droneEntity = std::make_shared<Entity>(ModelConfig{"/home/wmcgilvary/test.obj", 0.05f, 1.0f}, shader);
+    droneEntity->setVelocity({0.0f, 500.0f, 0.0f});
+    droneEntity->setForce({0.0f, -500.0f, 0.0f});
     m_scene.addEntity(droneEntity);
 
     // terrain

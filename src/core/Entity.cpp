@@ -1,6 +1,18 @@
 #include "Entity.hpp"
+#include "ModelRenderable.hpp"
 
 namespace Core {
+
+Entity::Entity()
+{
+    // default entity constructor
+}
+
+Entity::Entity(ModelConfig modelConfig, std::shared_ptr<Shader> shader)
+{
+    auto modelRenderable = std::make_shared<ModelRenderable>(modelConfig, shader);
+    setRenderable(modelRenderable);
+}
 
 void Entity::render(const Scene& scene, double dt)
 {

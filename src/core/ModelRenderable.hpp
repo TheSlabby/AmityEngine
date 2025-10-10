@@ -8,6 +8,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include "DataStructures.hpp"
 
 
 namespace Core {
@@ -41,13 +42,7 @@ private:
 
 
 
-// MODEL CONFIG
-struct ModelConfig
-{
-    std::string modelPath;
-    float scale {1.0f};
-    float brightness {1.0f};
-};
+
 // MODEL RENDERABLE 
 class ModelRenderable : public Renderable
 {
