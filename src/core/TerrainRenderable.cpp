@@ -7,6 +7,7 @@ namespace Core
 
     TerrainRenderable::TerrainRenderable(const TerrainSettings& settings, std::shared_ptr<Shader> shader) : Renderable(shader), m_terrainSettings(settings)
     {
+        m_scale = settings.terrainScale;
         int WIDTH = m_terrainSettings.terrainWidth;
         int HEIGHT = m_terrainSettings.terrainHeight;
         float TERRAIN_SCALE = m_terrainSettings.terrainAmplitude;
@@ -59,7 +60,7 @@ namespace Core
 
         glBindVertexArray(0); // release VAO
 
-        m_model = glm::scale(m_model, glm::vec3(m_terrainSettings.terrainScale));
+        m_model = glm::scale(m_model, glm::vec3(m_scale));
     }
 
     void TerrainRenderable::render(const Scene& scene, double dt)

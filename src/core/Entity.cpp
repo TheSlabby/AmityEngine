@@ -15,8 +15,11 @@ void Entity::updateRenderableModelMatrix()
 {
     if (m_renderable)
     {
-        glm::mat4 model = glm::translate(glm::mat4{1.0f}, m_position);
+        glm::mat4 model{1.0f};
+        model = glm::translate(model, m_position);
         model = model * glm::mat4(m_rotation);
+        model = glm::scale(model, glm::vec3(m_renderable->getScale()));
+
         m_renderable->setModelMatrix(model);
     }
 }

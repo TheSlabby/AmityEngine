@@ -99,7 +99,8 @@ void Mesh::draw()
 ModelRenderable::ModelRenderable(const ModelConfig& modelConfig, std::shared_ptr<Shader> shader) : Renderable(shader), m_config(modelConfig)
 {
     // m_model = glm::translate(m_model, glm::vec3(0, 200, 0));
-    m_model = glm::scale(m_model, glm::vec3(modelConfig.scale));
+    m_scale = m_config.scale;
+    m_model = glm::scale(m_model, glm::vec3(m_scale));
     loadModel();
 }
 

@@ -32,8 +32,13 @@ void TestGame::init()
     ballEntity->setRenderable(ballModel);
     m_scene.addEntity(ballEntity);
 
+    auto droneModel = std::make_shared<ModelRenderable>(ModelConfig{"/home/wmcgilvary/drone_dji.obj", 0.5f, 1.0f}, shader);
+    auto droneEntity = std::make_shared<CollisionEntity>();
+    droneEntity->setRenderable(droneModel);
+    m_scene.addEntity(droneEntity);
+
     // terrain
-    m_scene.addRenderable(std::make_shared<TerrainRenderable>(TerrainSettings{}, shader));
+    // m_scene.addRenderable(std::make_shared<TerrainRenderable>(TerrainSettings{}, shader));
 
     // set shaders
     shader->setShader("shaders/vert.glsl", "shaders/frag.glsl"); // TODO figure out paths better (so it works on windows too)

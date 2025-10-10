@@ -14,7 +14,7 @@ class Entity;
 class Scene
 {
 public:
-    // Scene();
+    ~Scene();
 
     // render loop
     void render(double dt);
@@ -32,11 +32,21 @@ public:
     void addRenderable(std::shared_ptr<Renderable> renderable) { m_renderables.push_back(renderable); }
     void addEntity(std::shared_ptr<Entity> entity) { m_entities.push_back(entity); }
 
+    void setScreenSize(int width, int height);
+    void setupFramebuffer();
+
 private:
     glm::mat4 m_projection;
     std::vector<std::shared_ptr<Renderable>> m_renderables;
     std::vector<std::shared_ptr<Entity>> m_entities;
     Camera m_camera;
+
+
+    GLuint m_fbo{0};
+    GLuint m_colorTexture{0};
+    GLuint m_depthBuffer{0};
+    int m_fboWidth{800};
+    int m_fboHeight{600}; 
 };
 
 }

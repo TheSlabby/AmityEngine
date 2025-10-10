@@ -35,6 +35,8 @@ Application::Application(int width, int height) : WIDTH(width), HEIGHT(height), 
     }
 
     glViewport(0, 0, WIDTH, HEIGHT);
+    m_scene.setScreenSize(WIDTH, HEIGHT);
+    m_scene.setupFramebuffer();
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -73,6 +75,7 @@ void Application::onResize(GLFWwindow* window, int width, int height)
     HEIGHT = height;
     glViewport(0, 0, WIDTH, HEIGHT);
     setupProjectionMatrix();
+    m_scene.setScreenSize(WIDTH, HEIGHT);
 }
 
 void Application::setupProjectionMatrix()
