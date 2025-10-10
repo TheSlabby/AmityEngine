@@ -1,6 +1,7 @@
 #pragma once
 #include "Renderable.hpp"
 #include "Scene.hpp"
+#include "DataStructures.hpp"
 #include <memory>
 
 namespace Core {
@@ -14,6 +15,9 @@ class Scene;
 class Entity
 {
 public:
+    Entity();
+    Entity(ModelConfig modelConfig, std::shared_ptr<Shader> shader); // automatically adds ModelRenderable
+
     virtual ~Entity() = default;
 
     glm::vec3 getPosition() const { return m_position; }

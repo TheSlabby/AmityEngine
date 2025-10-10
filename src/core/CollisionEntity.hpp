@@ -5,7 +5,8 @@ namespace Core {
 
 class CollisionEntity : public Entity
 {
-    
+public:
+    using Entity::Entity; 
 };
 
 }
