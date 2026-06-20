@@ -34,7 +34,7 @@ TEST(PanTiltComponentTest, SetAnglesUpdatesRotation)
 
     // Compute expected rotation matrix
     glm::mat3 expectedRot = glm::mat3(glm::yawPitchRoll(
-        glm::radians(45.0f),
+        -glm::radians(45.0f),
         glm::radians(30.0f),
         0.0f
     ));
@@ -63,7 +63,7 @@ TEST(PanTiltComponentTest, RotationUpdatesPropagateCorrectly)
     EXPECT_FLOAT_EQ(panTilt->getAzimuth(), 90.0f);
 
     glm::mat3 expectedRot = glm::mat3(glm::yawPitchRoll(
-        glm::radians(90.0f),
+        -glm::radians(90.0f),
         glm::radians(0.0f),
         0.0f
     ));
