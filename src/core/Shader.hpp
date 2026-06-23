@@ -9,6 +9,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <memory>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -44,5 +45,6 @@ public:
 	void setVec4(const std::string& name, glm::vec4 value) const;
 
 };
+using ShaderPtr = std::shared_ptr<Shader>;
 
 } // Core namespace

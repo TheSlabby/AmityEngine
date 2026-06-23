@@ -236,5 +236,11 @@ void main()
     float depthFactor = clamp(depthDiff / 6.0, 0.0, 1.0);    // Transition to opaque over 6.0 units
     float waterAlpha = mix(0.35, 0.88, depthFactor) * shorelineAlpha; // 35% to 88% transparency bounds
 
-    FragColor = vec4(aces_tonemap(finalColor * 2.0), waterAlpha);
+    const bool isGrayscale = true;
+    vec3 mapped = aces_tonemap(finalColor * 2.0);
+    if (isGrayscale) { // grayscale (if enabled)
+        float gray = dot(mapped, vec3(0.299, 0.587, 0.114));
+        mapped = vec3(gray);
+    }
+    FragColor = vec4(mapped, waterAlpha);
 }
