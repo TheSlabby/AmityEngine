@@ -33,7 +33,9 @@ public:
 
     glm::mat4 getProjectionMatrix() const
     {
-        return glm::perspective(glm::radians(m_fov), m_aspect, m_near, m_far);
+        // convert from HFOV to VFOV (perspective takes vfov)
+        float vFov = 2.0f * std::atan(std::tan(glm::radians(m_fov) * 0.5f) / m_aspect);
+        return glm::perspective(vFov, m_aspect, m_near, m_far);
     }
 
     glm::vec3 forwardVector() const
