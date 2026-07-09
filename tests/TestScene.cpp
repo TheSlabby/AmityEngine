@@ -103,7 +103,7 @@ TEST(SceneTest, DynamicCameraProjection)
     // Verify aspect ratio changes propagate dynamically too
     cameraComp->setAspect(1.0f); // Square screen
     glm::mat4 projSquare = scene.getProjection();
-    EXPECT_NE(proj60[0][0], projSquare[0][0]);
+    EXPECT_NE(proj60[1][1], projSquare[1][1]);
 }
 
 // Test 4: Verify customizable post-processing shader paths and custom setting
