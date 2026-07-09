@@ -102,26 +102,6 @@ if(AMITY_ENABLE_LUA)
 endif()
 
 
-
-# Voxel Minecraft Clone Executable Target (AmityCraft)
-add_executable(AmityCraft
-    src/games/AmityCraft/main.cpp
-    src/games/AmityCraft/CraftMinerGame.cpp
-    src/games/AmityCraft/PlayerController.cpp
-    src/games/AmityCraft/VoxelWorld.cpp
-)
-target_link_libraries(AmityCraft PRIVATE AmityCore)
-target_include_directories(AmityCraft PRIVATE src/games/AmityCraft)
-
-# Post-Build Custom Command to copy shaders next to the AmityCraft executable
-add_custom_command(
-    TARGET AmityCraft POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-            "${CMAKE_CURRENT_SOURCE_DIR}/src/shaders"
-            "$<TARGET_FILE_DIR:AmityCraft>/shaders"
-    COMMENT "copy shaders to AmityCraft build dir"
-)
-
 # Pan/Tilt Camera Showcase Target (PanTiltShowcase)
 add_executable(PanTiltShowcase
     src/games/PanTiltShowcase/main.cpp
@@ -137,41 +117,6 @@ add_custom_command(
             "${CMAKE_CURRENT_SOURCE_DIR}/src/shaders"
             "$<TARGET_FILE_DIR:PanTiltShowcase>/shaders"
     COMMENT "copy shaders to PanTiltShowcase build dir"
-)
-
-# Canyon Siege Game Target (CanyonSiege)
-add_executable(CanyonSiege
-    src/games/CanyonSiege/main.cpp
-    src/games/CanyonSiege/CanyonSiegeGame.cpp
-)
-target_link_libraries(CanyonSiege PRIVATE AmityCore)
-target_include_directories(CanyonSiege PRIVATE src/games/CanyonSiege)
-target_include_directories(CanyonSiege PRIVATE src/third_party/stb)
-
-# Post-Build Custom Command to copy shaders next to the CanyonSiege executable
-add_custom_command(
-    TARGET CanyonSiege POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-            "${CMAKE_CURRENT_SOURCE_DIR}/src/shaders"
-            "$<TARGET_FILE_DIR:CanyonSiege>/shaders"
-    COMMENT "copy shaders to CanyonSiege build dir"
-)
-
-# Shadows of Amity Labyrinth horror game target (AmityLabyrinth)
-add_executable(AmityLabyrinth
-    src/games/AmityLabyrinth/main.cpp
-    src/games/AmityLabyrinth/LabyrinthGame.cpp
-)
-target_link_libraries(AmityLabyrinth PRIVATE AmityCore)
-target_include_directories(AmityLabyrinth PRIVATE src/games/AmityLabyrinth)
-
-# Post-Build Custom Command to copy shaders next to the AmityLabyrinth executable
-add_custom_command(
-    TARGET AmityLabyrinth POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-            "${CMAKE_CURRENT_SOURCE_DIR}/src/shaders"
-            "$<TARGET_FILE_DIR:AmityLabyrinth>/shaders"
-    COMMENT "copy shaders to AmityLabyrinth build dir"
 )
 
 # Stormy Sails Sailing Game target (StormySails)
@@ -190,6 +135,26 @@ add_custom_command(
             "${CMAKE_CURRENT_SOURCE_DIR}/src/shaders"
             "$<TARGET_FILE_DIR:StormySails>/shaders"
     COMMENT "copy shaders to StormySails build dir"
+)
+
+
+# Minecraft Voxel Game target (Minecraft)
+add_executable(Minecraft
+    src/games/Minecraft/main.cpp
+    src/games/Minecraft/Minecraft.cpp
+    src/games/Minecraft/Chunk.cpp
+)
+target_link_libraries(Minecraft PRIVATE AmityCore)
+target_include_directories(Minecraft PRIVATE src/games/Minecraft)
+target_include_directories(Minecraft PRIVATE src/third_party/stb)
+
+# Post-Build Custom Command to copy shaders next to the Minecraft executable
+add_custom_command(
+    TARGET Minecraft POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/shaders"
+            "$<TARGET_FILE_DIR:Minecraft>/shaders"
+    COMMENT "copy shaders to Minecraft build dir"
 )
 
 
