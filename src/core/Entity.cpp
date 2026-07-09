@@ -8,12 +8,10 @@ Entity::Entity()
 
 Entity::~Entity()
 {
-    for (auto& comp : m_components)
+    // iterate all components
+    for (auto& [_, comp] : m_componentMap)
     {
-        if (comp)
-        {
-            comp->setOwner(nullptr);
-        }
+        comp->setOwner(nullptr);
     }
 }
 
@@ -31,7 +29,7 @@ void Entity::lookAt(const glm::vec3& target)
 
 void Entity::update(double dt)
 {
-    for (auto& comp : m_components)
+    for (auto& [_, comp] : m_componentMap)
     {
         comp->update(dt);
     }

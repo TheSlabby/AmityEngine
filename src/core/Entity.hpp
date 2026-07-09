@@ -1,5 +1,4 @@
 #pragma once
-#include <vector>
 #include <memory>
 #include <string>
 #include <typeindex>
@@ -38,7 +37,6 @@ public:
     {
         auto comp = std::make_shared<T>(std::forward<Args>(args)...);
         comp->setOwner(this);
-        m_components.push_back(comp);
         m_componentMap[std::type_index(typeid(T))] = comp;
         comp->init();
         return comp;
@@ -61,6 +59,20 @@ public:
         return m_componentMap.find(std::type_index(typeid(T))) != m_componentMap.end();
     }
 
+    template<typename T>
+    bool removeComponent()
+    {
+        auto it = m_componentMap.find(std::type_index(typeid(T)));
+        if (it != m_componentMap.end())
+        {
+            it->second->setOwner(nullptr);
+            m_componentMap.erase(it);
+            return true;
+        }
+
+        return false; // couldn't find component
+    }
+
     void update(double dt);
 
 private:
@@ -68,7 +80,6 @@ private:
     glm::mat3 m_rotation{1.0f};
     glm::vec3 m_scale{1.0f};
 
-    std::vector<std::shared_ptr<Component>> m_components;
     std::unordered_map<std::type_index, std::shared_ptr<Component>> m_componentMap;
     std::string m_name;
 };
