@@ -254,10 +254,13 @@ void main()
     // Only draw volumetric clouds where depth is infinity (background/sky)
     if (depth >= 0.99999)
     {
-        vec2 aspect_ratio = vec2(iResolution.x / iResolution.y, 1.0);
+        // HFOV convention: FOV is the horizontal half-angle tangent (tan(hFov/2)),
+        // so horizontal is fixed and vertical is derived via 1/aspect. This matches
+        // CameraComponent's HFOV projection so clouds and geometry track together.
+        vec2 fov_scale = vec2(1.0, iResolution.y / iResolution.x);
         vec3 eye = vec3(0.0, 0.0, 0.0);
-        
-        vec3 point_cam = vec3((2.0 * TexCoords - 1.0) * aspect_ratio * FOV, -1.0);
+
+        vec3 point_cam = vec3((2.0 * TexCoords - 1.0) * fov_scale * FOV, -1.0);
         ray_t ray = get_primary_ray(point_cam, eye);
         
         vec3 skyColor = render_sky(ray) * cld_brightness;
