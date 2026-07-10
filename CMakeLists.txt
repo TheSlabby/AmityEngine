@@ -143,6 +143,7 @@ add_executable(Minecraft
     src/games/Minecraft/main.cpp
     src/games/Minecraft/Minecraft.cpp
     src/games/Minecraft/Chunk.cpp
+    src/games/Minecraft/Player.cpp
 )
 target_link_libraries(Minecraft PRIVATE AmityCore)
 target_include_directories(Minecraft PRIVATE src/games/Minecraft)

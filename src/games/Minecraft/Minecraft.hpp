@@ -2,6 +2,7 @@
 
 #include <Application.hpp>
 #include "Chunk.hpp"
+#include "Player.hpp"
 
 using namespace Core;
 
@@ -16,5 +17,7 @@ public:
 
 private:
     ChunkPtr m_chunk; // eventually itll be a list of chunks
+
+    Player m_player;
     
 };
