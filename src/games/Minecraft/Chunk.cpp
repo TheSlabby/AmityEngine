@@ -1,4 +1,5 @@
 #include "Chunk.hpp"
+#include <random>
 
 Chunk::Chunk(glm::ivec2 pos, ShaderPtr shader) : Renderable(shader), m_position(pos)
 {
@@ -7,6 +8,12 @@ Chunk::Chunk(glm::ivec2 pos, ShaderPtr shader) : Renderable(shader), m_position(
 
     // testing
     m_model = glm::translate(m_model, glm::vec3{5, 0, -10});
+}
+
+Chunk::~Chunk()
+{
+    if (m_vao != 0) glDeleteVertexArrays(1, &m_vao);
+    if (m_vbo != 0) glDeleteBuffers(1, &m_vbo);
 }
 
 void Chunk::render(const Scene& scene, double dt)
@@ -32,6 +39,8 @@ void Chunk::render(const Scene& scene, double dt)
 
 void Chunk::buildMesh()
 {
+    buildVertices(); // build m_vertices based on m_blocks
+
     // clear up old VAO/VBO
     if (m_vao) { glDeleteVertexArrays(1, &m_vao);   m_vao = 0; }
     if (m_vbo) { glDeleteBuffers(1, &m_vbo);        m_vbo = 0; }
@@ -82,4 +91,70 @@ void Chunk::proceduralGeneration()
         {{0,0,0},{0,-1,0}}, {{1,0,0},{0,-1,0}}, {{0,0,1},{0,-1,0}},
         {{0,0,1},{0,-1,0}}, {{1,0,0},{0,-1,0}}, {{1,0,1},{0,-1,0}},
     };
+}
+
+// build vertices based off of m_blocks, DO CULLING!
+void Chunk::buildVertices()
+{
+    m_vertices.clear();
+
+    // random m_blocks for esting purspoes
+    for (int x = 0; x < CHUNK_SIZE; ++x) {
+        for (int y = 0; y < CHUNK_HEIGHT; ++y) {
+            for (int z = 0; z < CHUNK_SIZE; ++z) {
+                static std::random_device rd;
+                static std::mt19937 gen(rd());
+                static std::uniform_real_distribution<float> dis(0.0f, 1.0f);
+                if (dis(gen) > 0.8) {
+                    m_blocks[x][y][z] = 1;
+                } else {
+                    m_blocks[x][y][z] = 0; 
+                }
+            }
+        }
+    }
+
+    for (int x = 0; x < CHUNK_SIZE; ++x) {
+        for (int y = 0; y < CHUNK_HEIGHT; ++y) {
+            for (int z = 0; z < CHUNK_SIZE; ++z) {
+                auto blockID = m_blocks[x][y][z];
+                if (blockID == 0) continue; // skip air
+                
+                glm::ivec3 pos {x, y, z};
+                // RENDER A FACE IF IT IS VISIBLE!
+                // so we have to check 6 directions: +x, -x, +y, -y, +z, -z
+                for (int i = 0; i < DIRECTIONS.size(); ++i) {
+                    bool shouldDrawFace = false;
+                    const auto& dir = DIRECTIONS[i];
+                    glm::ivec3 neighbor = pos + dir;
+                    // check oob (if edge of chunk, it will be a face)
+                    if (
+                        (neighbor.x >= CHUNK_SIZE || neighbor.x < 0) ||
+                        (neighbor.y >= CHUNK_HEIGHT || neighbor.y < 0) ||
+                        (neighbor.z >= CHUNK_SIZE || neighbor.z < 0)
+                    ) {
+                        shouldDrawFace = true;
+                    }
+                    // check if neighbor is air (if so, its exposed, so draw face)
+                    else if (m_blocks[neighbor.x][neighbor.y][neighbor.z] == 0) { 
+                        shouldDrawFace = true;
+                    }
+
+                    if (shouldDrawFace)
+                    {
+                        // get face template
+                        const auto& faceTemplate = FACE_TEMPLATES[i];
+                        for (const auto& vertices : faceTemplate) {
+                            Vertex v;
+                            v.Normal = dir;
+                            v.Position = {
+                                glm::vec3(pos) + vertices,
+                            };
+                            m_vertices.push_back(v);
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
