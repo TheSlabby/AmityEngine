@@ -7,11 +7,10 @@ A lightweight 3D game engine written in C++23 with OpenGL
 ---
 
 ## Screenshots
+<img width="2622" height="1127" alt="image" src="https://github.com/user-attachments/assets/a67f2ee7-0f2a-4966-8f13-c2241852e797" />
+<img width="1562" height="1168" alt="image" src="https://github.com/user-attachments/assets/2e27295f-e0de-4e42-8c19-ec5798953cd4" />
+<img width="2298" height="963" alt="image" src="https://github.com/user-attachments/assets/daf137b3-3d90-4df3-b485-cdd28425b729" />
 
-<img width="1669" height="660" alt="image" src="https://github.com/user-attachments/assets/9495fab6-0e01-4bb5-ad7b-47579c12a5b7" />
-<img width="1661" height="680" alt="image" src="https://github.com/user-attachments/assets/66635eaa-6c35-43eb-b097-e4f55d8ef6e2" />
-<img width="1646" height="873" alt="image" src="https://github.com/user-attachments/assets/357fb50f-3a6c-4052-b8e1-ea1ddbe109eb" />
-<img width="1202" height="825" alt="image" src="https://github.com/user-attachments/assets/6492c8bb-b566-4652-9d99-7d2cd058e5d9" />
 
 
 ---
