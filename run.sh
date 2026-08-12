@@ -6,4 +6,6 @@ cd build
 cmake ..
 make -j24
 cd ..
-build/Amity
+
+#build/Amity
+build/Minecraft

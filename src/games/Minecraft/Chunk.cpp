@@ -4,6 +4,9 @@
 Chunk::Chunk(glm::ivec2 pos, ShaderPtr shader) : Renderable(shader), m_position(pos)
 {
     proceduralGeneration();
+    buildVertices(); // build m_vertices based on m_blocks
+
+    // THIS IS GPU WORK so it must go on main thread
     buildMesh();
 
     // testing
@@ -39,8 +42,6 @@ void Chunk::render(const Scene& scene, double dt)
 
 void Chunk::buildMesh()
 {
-    buildVertices(); // build m_vertices based on m_blocks
-
     // clear up old VAO/VBO
     if (m_vao) { glDeleteVertexArrays(1, &m_vao);   m_vao = 0; }
     if (m_vbo) { glDeleteBuffers(1, &m_vbo);        m_vbo = 0; }
