@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Application.hpp>
-#include "Chunk.hpp"
+#include "ChunkManager.hpp"
 #include "Player.hpp"
 
 using namespace Core;
@@ -15,7 +15,11 @@ public:
     void update(double dt) override;
     void renderUI() override;
 
+protected:
+    void shutdown() override;
+
 private:
+    ChunkManager m_chunkManager;
     ChunkPtr m_chunk; // eventually itll be a list of chunks
 
     Player m_player;

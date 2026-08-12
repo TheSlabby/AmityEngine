@@ -153,9 +153,16 @@ int Application::run()
         glfwPollEvents();
     }
 
+    shutdown();
+
     return 0;
 }
 
+
+void Application::shutdown()
+{
+    std::cout << "Exiting..." << std::endl; 
+}
 
 
 } // Core namespace

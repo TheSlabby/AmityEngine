@@ -50,6 +50,8 @@ protected:
     int HEIGHT;
     Scene m_scene; // must come after width/height because its constructed bsaed on these values
 
+    virtual void shutdown(); // custom override logic
+
     
     double m_runTime { 0.0 };
 
