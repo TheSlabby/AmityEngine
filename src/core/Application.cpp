@@ -121,6 +121,9 @@ void Application::onResizeCallback(GLFWwindow* window, int width, int height)
 }
 void Application::onResize(GLFWwindow* window, int width, int height)
 {
+    // minimized: keep the old size instead of rebuilding everything at 0x0
+    if (width == 0 || height == 0) return;
+
     WIDTH = width;
     HEIGHT = height;
     glViewport(0, 0, WIDTH, HEIGHT);

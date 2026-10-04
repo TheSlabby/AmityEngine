@@ -25,7 +25,7 @@ private:
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
 
-    GLuint VAO, VBO, EBO;
+    GLuint VAO = 0, VBO = 0;
 
     TerrainSettings m_terrainSettings;
 

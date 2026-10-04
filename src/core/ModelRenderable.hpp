@@ -24,6 +24,16 @@ public:
         setupMesh();
     }
     ~Mesh();
+    
+    // disable copying
+    Mesh(const Mesh&) = delete;
+    Mesh& operator=(const Mesh&) = delete;
+
+    // moving
+    Mesh(Mesh&&) noexcept;
+    Mesh& operator=(Mesh&&) noexcept;
+
+
     void draw();
 
     glm::vec4 getMaterialColor() const { return materialColor; }
@@ -37,7 +47,7 @@ private:
     std::vector<Texture> textures;
     glm::vec4 materialColor;
 
-    GLuint VAO, VBO, EBO;
+    GLuint VAO = 0, VBO = 0, EBO = 0;
 
     void setupMesh();
 
@@ -52,6 +62,14 @@ class ModelRenderable : public Renderable
 {
 public:
     ModelRenderable(const ModelConfig& modelConfig, std::shared_ptr<Shader> shader);
+    ~ModelRenderable();
+
+    // owns GL textures, so no copying (Assimp::Importer isn't movable either)
+    ModelRenderable(const ModelRenderable&) = delete;
+    ModelRenderable& operator=(const ModelRenderable&) = delete;
+    ModelRenderable(ModelRenderable&&) = delete;
+    ModelRenderable& operator=(ModelRenderable&&) = delete;
+
     void render(const Scene& scene, double dt) override;
     const std::vector<std::unique_ptr<Mesh>>& getMeshes() const { return meshes; }
 

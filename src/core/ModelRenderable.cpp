@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iostream>
 #include "Log.hpp"
+#include <utility>
 
 // STB IMAGE
 #define STB_IMAGE_IMPLEMENTATION
@@ -166,6 +167,36 @@ Mesh::~Mesh()
     if (EBO != 0) glDeleteBuffers(1, &EBO);
 }
 
+Mesh::Mesh(Mesh&& other) noexcept
+    : VAO(other.VAO), VBO(other.VBO), EBO(other.EBO)
+{
+    this->vertices = std::move(other.vertices);
+    this->indices = std::move(other.indices);
+    this->textures = std::move(other.textures);
+    this->materialColor = other.materialColor;
+    other.VAO = 0;
+    other.VBO = 0;
+    other.EBO = 0;
+}
+
+Mesh& Mesh::operator=(Mesh&& other) noexcept
+{
+    if (this != &other) {
+        if (VAO != 0) glDeleteVertexArrays(1, &VAO);
+        if (VBO != 0) glDeleteBuffers(1, &VBO);
+        if (EBO != 0) glDeleteBuffers(1, &EBO);
+        this->vertices = std::move(other.vertices);
+        this->indices = std::move(other.indices);
+        this->textures = std::move(other.textures);
+        this->materialColor = other.materialColor;
+        this->VAO = std::exchange(other.VAO, 0);
+        this->VBO = std::exchange(other.VBO, 0);
+        this->EBO = std::exchange(other.EBO, 0);
+    }
+    return *this;
+}
+
+
 void Mesh::draw()
 {
     glBindVertexArray(VAO);
@@ -184,6 +215,15 @@ ModelRenderable::ModelRenderable(const ModelConfig& modelConfig, std::shared_ptr
     m_scale = m_config.scale;
     m_model = glm::scale(m_model, glm::vec3(m_scale));
     loadModel();
+}
+
+ModelRenderable::~ModelRenderable()
+{
+    // meshes only hold copies of these IDs, the model owns the textures
+    for (const auto& texture : texturesLoaded)
+    {
+        glDeleteTextures(1, &texture.id);
+    }
 }
 
 void ModelRenderable::loadModel()

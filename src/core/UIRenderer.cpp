@@ -23,8 +23,10 @@ bool UIRenderer::s_initialized = false;
 bool UIRenderer::s_savedDepthTest = false;
 bool UIRenderer::s_savedCullFace = false;
 bool UIRenderer::s_savedBlend = false;
-int UIRenderer::s_savedBlendSrc = 0;
-int UIRenderer::s_savedBlendDst = 0;
+int UIRenderer::s_savedBlendSrcRGB = 0;
+int UIRenderer::s_savedBlendDstRGB = 0;
+int UIRenderer::s_savedBlendSrcAlpha = 0;
+int UIRenderer::s_savedBlendDstAlpha = 0;
 
 struct UIVertex {
     glm::vec2 Position;
@@ -101,8 +103,10 @@ void UIRenderer::Begin()
     s_savedBlend = glIsEnabled(GL_BLEND);
     if (s_savedBlend)
     {
-        glGetIntegerv(GL_BLEND_SRC_ALPHA, &s_savedBlendSrc);
-        glGetIntegerv(GL_BLEND_DST_ALPHA, &s_savedBlendDst);
+        glGetIntegerv(GL_BLEND_SRC_RGB, &s_savedBlendSrcRGB);
+        glGetIntegerv(GL_BLEND_DST_RGB, &s_savedBlendDstRGB);
+        glGetIntegerv(GL_BLEND_SRC_ALPHA, &s_savedBlendSrcAlpha);
+        glGetIntegerv(GL_BLEND_DST_ALPHA, &s_savedBlendDstAlpha);
     }
 
     // Set UI specific states
@@ -144,7 +148,7 @@ void UIRenderer::End()
     if (s_savedBlend)
     {
         glEnable(GL_BLEND);
-        glBlendFunc(s_savedBlendSrc, s_savedBlendDst);
+        glBlendFuncSeparate(s_savedBlendSrcRGB, s_savedBlendDstRGB, s_savedBlendSrcAlpha, s_savedBlendDstAlpha);
     }
     else
     {

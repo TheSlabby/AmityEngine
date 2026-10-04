@@ -137,8 +137,10 @@ private:
     static bool s_savedDepthTest;
     static bool s_savedCullFace;
     static bool s_savedBlend;
-    static int s_savedBlendSrc;
-    static int s_savedBlendDst;
+    static int s_savedBlendSrcRGB;
+    static int s_savedBlendDstRGB;
+    static int s_savedBlendSrcAlpha;
+    static int s_savedBlendDstAlpha;
 };
 
 } // namespace Core
