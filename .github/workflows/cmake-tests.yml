@@ -2,13 +2,13 @@ name: CMake Build and Test Suite
 
 on:
   push:
-    branches: [ main ]
   pull_request:
     branches: [ main ]
 
 env:
-  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Debug
+  # vcpkg caches built packages here; the folder is saved/restored with actions/cache below
+  VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg-binary-cache
 
 jobs:
   build-and-test:
@@ -19,35 +19,25 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    - name: Set up MSBuild
-      uses: microsoft/setup-msbuild@v2
+    - name: Set up vcpkg
+      run: |
+        # the runner ships with vcpkg preinstalled; point the CMake preset at it
+        echo "VCPKG_ROOT=$env:VCPKG_INSTALLATION_ROOT" >> $env:GITHUB_ENV
+        New-Item -ItemType Directory -Force "${{ env.VCPKG_DEFAULT_BINARY_CACHE }}" | Out-Null
 
-    - name: Set up vcpkg Caching
+    - name: Cache vcpkg packages
       uses: actions/cache@v4
       with:
-        path: |
-          ~/AppData/Local/vcpkg/archives
-          ${{ github.workspace }}/build/vcpkg_installed
-        key: ${{ runner.os }}-vcpkg-${{ hashFiles('**/vcpkg.json') }}
+        path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
+        key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json') }}
         restore-keys: |
           ${{ runner.os }}-vcpkg-
 
-    - name: Install Dependencies via vcpkg
-      run: |
-        vcpkg install glfw3 glm assimp openal-soft libsndfile --triplet x64-windows
-
     - name: Configure CMake
-      run: |
-        cmake -B ${{ github.workspace }}/build -S ${{ github.workspace }} `
-          -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} `
-          -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" `
-          -DVCPKG_TARGET_TRIPLET=x64-windows
+      run: cmake --preset windows
 
     - name: Build AmityTests Target
-      run: |
-        cmake --build ${{ github.workspace }}/build --config ${{ env.BUILD_TYPE }} --target AmityTests -j 4
+      run: cmake --build build/windows --config ${{ env.BUILD_TYPE }} --target AmityTests
 
     - name: Execute Automated Unit Tests (CTest)
-      working-directory: ${{ github.workspace }}/build
-      run: |
-        ctest -C ${{ env.BUILD_TYPE }} --output-on-failure
+      run: ctest --test-dir build/windows -C ${{ env.BUILD_TYPE }} --output-on-failure
