@@ -1,0 +1,69 @@
+---
+title: Getting Started
+description: Build AmityEngine and run the demo games.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+AmityEngine builds with CMake. [vcpkg](https://vcpkg.io) installs every dependency for you from `vcpkg.json`: GLFW, GLM, Assimp, OpenAL and libsndfile, plus GoogleTest and Lua when those are enabled.
+
+## Prerequisites
+
+- **Visual Studio 2022** or newer, with the C++ workload
+- **CMake 3.25+**
+- **Git**
+
+## Build
+
+<Steps>
+
+1. **Install vcpkg** (one-time setup) and set the `VCPKG_ROOT` environment variable to its folder:
+
+   ```bash
+   git clone https://github.com/microsoft/vcpkg
+   ./vcpkg/bootstrap-vcpkg.bat        # or bootstrap-vcpkg.sh on Linux/macOS
+   ```
+
+2. **Clone AmityEngine:**
+
+   ```bash
+   git clone https://github.com/TheSlabby/AmityEngine
+   cd AmityEngine
+   ```
+
+3. **Configure:**
+
+   ```bash
+   cmake --preset windows
+   ```
+
+   The first configure builds every dependency, which takes a while. Later configures reuse vcpkg's cache.
+
+4. **Build:**
+
+   ```bash
+   cmake --build build/windows --config Release
+   ```
+
+   To build a single target, pass `--target`:
+
+   ```bash
+   cmake --build build/windows --config Debug --target StormySails
+   ```
+
+</Steps>
+
+<Aside type="tip">
+If vcpkg ever seems to ignore `vcpkg.json`, reconfigure with `cmake --preset windows --fresh`.
+</Aside>
+
+## Run the tests
+
+```bash
+ctest --test-dir build/windows -C Debug --output-on-failure
+```
+
+## Next steps
+
+- [Your First Game](../first-game/) walks through subclassing `Application`.
+- [Build Options](../../reference/build-options/) lists every CMake switch.

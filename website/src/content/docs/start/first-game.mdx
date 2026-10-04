@@ -1,0 +1,100 @@
+---
+title: Your First Game
+description: Subclass Application, set up a scene and run the game loop.
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+Every AmityEngine game is a subclass of `Core::Application`. The application owns the window, the audio context, input and a `Scene`. You override two methods:
+
+| Method | When it runs |
+|---|---|
+| `init()` | Once, after the window and OpenGL context exist. Build your scene here. |
+| `update(double dt)` | Every frame, with `dt` in seconds. |
+| `renderUI()` *(optional)* | Every frame, after the 3D scene renders. |
+
+<Steps>
+
+1. **Declare your game class**
+
+   ```cpp title="MyGame.hpp"
+   #pragma once
+   #include <Application.hpp>
+   #include <Entity.hpp>
+
+   class MyGame : public Core::Application
+   {
+   public:
+       MyGame();
+
+       void init() override;
+       void update(double dt) override;
+
+   private:
+       std::shared_ptr<Core::Entity> m_camera;
+       std::shared_ptr<Core::Entity> m_tree;
+   };
+   ```
+
+2. **Build the scene in `init()`**
+
+   The factories in `core/factory/` return ready-made entities with their components already attached.
+
+   ```cpp title="MyGame.cpp"
+   #include "MyGame.hpp"
+   #include <factory/EntityFactory.hpp>
+   #include <factory/CameraFactory.hpp>
+   #include <ResourceManager.hpp>
+
+   using namespace Core;
+
+   MyGame::MyGame() : Application(1280, 720)
+   {
+       m_appName = "My Game";
+       m_clearColor = glm::vec4(0.05f, 0.07f, 0.10f, 1.0f);
+   }
+
+   void MyGame::init()
+   {
+       auto shader = ResourceManager::GetShader(
+           "DefaultModelShader", "src/shaders/vert.glsl", "src/shaders/frag.glsl");
+
+       m_camera = CameraFactory::CreatePanTiltCamera();
+       m_camera->setPosition({0.0f, 10.0f, 30.0f});
+       m_scene.addEntity(m_camera);
+       m_scene.setCameraEntity(m_camera);
+
+       m_tree = EntityFactory::CreateTree(shader);
+       m_scene.addEntity(m_tree);
+   }
+   ```
+
+3. **Animate it in `update()`**
+
+   ```cpp title="MyGame.cpp"
+   void MyGame::update(double dt)
+   {
+       m_tree->rotate(static_cast<float>(dt) * 0.5f, {0.0f, 1.0f, 0.0f});
+   }
+   ```
+
+4. **Write `main()`**
+
+   ```cpp title="main.cpp"
+   #include "MyGame.hpp"
+
+   int main()
+   {
+       MyGame game;
+       game.init();
+       return game.run();
+   }
+   ```
+
+</Steps>
+
+<Aside>
+`run()` drives the frame loop. Each frame it updates the scene's entities, calls your `update()`, renders the scene, then calls `renderUI()` between `UIRenderer::Begin()` and `End()`.
+</Aside>
+
+See `src/games/PanTiltShowcase/` for a complete example with input, audio and UI.

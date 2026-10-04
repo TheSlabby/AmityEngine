@@ -1,0 +1,43 @@
+---
+title: Resource Manager
+description: Cached loading of shaders and models.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+`Core::ResourceManager` is a static cache for shaders and models. The first request loads or compiles the resource. Later requests return the same `shared_ptr`.
+
+## Shaders
+
+Shaders are cached by **name**:
+
+```cpp
+auto shader = Core::ResourceManager::GetShader(
+    "DefaultModelShader",          // cache key
+    "src/shaders/vert.glsl",
+    "src/shaders/frag.glsl");
+```
+
+## Models
+
+Models are cached by **file path**:
+
+```cpp
+auto ship = Core::ResourceManager::GetModel(
+    "assets/models/ship.obj",
+    1.0f,    // scale
+    1.0f,    // brightness
+    shader);
+```
+
+<Aside type="caution">
+Because the cache key is the path, asking for the same model again with a different scale or shader returns the **first** instance unchanged.
+</Aside>
+
+## Clearing
+
+```cpp
+Core::ResourceManager::Clear();
+```
+
+This drops every cached shader and model. GPU resources are freed once nothing else holds a reference to them.

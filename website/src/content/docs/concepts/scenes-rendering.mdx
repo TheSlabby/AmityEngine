@@ -1,0 +1,45 @@
+---
+title: Scenes & Rendering
+description: How the Scene updates entities and draws renderables.
+---
+
+A `Core::Scene` holds everything in your world. Each `Application` owns one, called `m_scene`.
+
+## What a scene holds
+
+- **Entities**: game objects, updated every frame. Add them with `addEntity()` and remove them with `removeEntity()`. Removal is deferred until it's safe.
+- **Renderables**: objects that draw themselves, such as terrain or water. Add them with `addRenderable()`.
+- **A camera entity**: set it with `setCameraEntity()`. The scene builds its view and projection matrices from it.
+
+```cpp
+m_scene.addEntity(player);
+m_scene.setCameraEntity(camera);
+m_scene.addRenderable(std::make_shared<Core::WaterRenderable>(Core::WaterSettings{}, waterShader));
+```
+
+## Renderables
+
+`Core::Renderable` is the base class for anything that issues draw calls. It holds a shader and a model matrix. Subclasses implement one method:
+
+```cpp
+virtual void render(const Scene& scene, double dt) = 0;
+```
+
+`render()` receives the scene, so a renderable can read `getView()`, `getProjection()`, `getTime()` and `getDepthTexture()`.
+
+| Renderable | Purpose |
+|---|---|
+| `ModelRenderable` | Meshes loaded through Assimp. |
+| `TerrainRenderable` | Generated terrain with diffuse lighting. |
+| `WaterRenderable` | Animated ocean surface (fragment-shader waves). |
+
+## Post-processing
+
+The scene renders into an offscreen framebuffer, then draws a full-screen quad through a post-processing shader. The default pass adds volumetric clouds. To swap in your own:
+
+```cpp
+m_scene.setPostProcessShader("src/shaders/postprocessVert.glsl",
+                             "src/shaders/my_postprocessFrag.glsl");
+```
+
+The post shader can sample the scene's color and depth textures, which makes it the place for fog, color grading or screen-space effects.

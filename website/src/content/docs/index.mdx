@@ -1,0 +1,77 @@
+---
+title: AmityEngine
+description: A lightweight 3D game engine written in C++23 with OpenGL.
+template: splash
+hero:
+  title: Build 3D games in modern C++.
+  tagline: AmityEngine is a lightweight engine built on C++23 and OpenGL, with an actor-component model, spatial audio, Lua scripting and a shader pipeline you can actually read.
+  actions:
+    - text: Get started
+      link: /AmityEngine/start/getting-started/
+      icon: right-arrow
+    - text: View on GitHub
+      link: https://github.com/TheSlabby/AmityEngine
+      icon: github
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+import { Image } from 'astro:assets';
+import ocean from '../../assets/hero.png';
+import tree from '../../assets/shot2.png';
+import island from '../../assets/shot3.png';
+
+<Image src={island} alt="Voxel island built in AmityEngine" class="screenshot banner not-content" loading="eager" />
+
+## Features
+
+<CardGrid stagger>
+	<Card title="Actor-component model" icon="puzzle">
+		Build games from `Entity`, `Component` and `Scene`, the same way you
+		would with GameObjects in Unity.
+	</Card>
+	<Card title="Rendering" icon="star">
+		Assimp model loading, terrain, an animated ocean shader and a
+		post-processing pass with volumetric clouds.
+	</Card>
+	<Card title="Spatial audio" icon="analytics">
+		3D positional sound through OpenAL, attached to entities with
+		`SoundComponent`.
+	</Card>
+	<Card title="Lua scripting" icon="seti:lua">
+		Embedded Lua through `LuaScriptService`. Turn it on with
+		`AMITY_ENABLE_LUA`.
+	</Card>
+	<Card title="UI & fonts" icon="window">
+		A lightweight 2D `UIRenderer` for panels, bitmap-font text and HUD
+		crosshairs.
+	</Card>
+	<Card title="Resource caching" icon="database">
+		`ResourceManager` compiles shaders and loads models once, then hands
+		back the cached copy.
+	</Card>
+</CardGrid>
+
+## Gallery
+
+<div class="gallery not-content">
+	<Image src={ocean} alt="Stormy ocean with volumetric clouds" class="screenshot" />
+	<Image src={tree} alt="Low-poly tree over animated water" class="screenshot" />
+	<Image src={island} alt="Voxel island with trees" class="screenshot" />
+</div>
+
+## A taste of the API
+
+```cpp
+// Load (or reuse) a shader and a model
+auto shader = Core::ResourceManager::GetShader("main", "vert.glsl", "frag.glsl");
+auto model  = Core::ResourceManager::GetModel("assets/models/ship.obj", 1.0f, 1.0f, shader);
+
+// Create an entity and give it behavior with components
+auto ship = std::make_shared<Core::Entity>();
+ship->setName("PirateShip");
+ship->setPosition({0.0f, 5.0f, -10.0f});
+ship->addComponent<Core::MeshComponent>(model, shader);
+
+scene->addEntity(ship);
+```

@@ -1,0 +1,52 @@
+---
+title: Events
+description: A lightweight typed signal for decoupling systems.
+---
+
+`Core::Event<Args...>` is a small typed signal. Systems `Connect` callbacks, and the owner calls `fire` to invoke all of them in the order they connected.
+
+```cpp
+#include <Event.hpp>
+
+Core::Event<int, float> onDamage;
+
+onDamage.Connect([](int amount, float knockback) {
+    std::cout << "Took " << amount << " damage\n";
+});
+
+onDamage.fire(25, 3.0f);
+```
+
+## Exposing events from a class
+
+Make the event a public member so other systems can subscribe:
+
+```cpp
+class Health : public Core::Component
+{
+public:
+    Core::Event<> onDeath;
+
+    void damage(int amount)
+    {
+        m_hp -= amount;
+        if (m_hp <= 0)
+            onDeath.fire();
+    }
+
+private:
+    int m_hp{100};
+};
+```
+
+```cpp
+player->getComponent<Health>()->onDeath.Connect([&] { showGameOver(); });
+```
+
+`UserInputService` uses the same pattern. Its `InputBegan` and `InputEnded` events fire with a `KeyCode`:
+
+```cpp
+getUserInputService().InputBegan.Connect([](Core::KeyCode key) {
+    // react to a key press
+});
+```

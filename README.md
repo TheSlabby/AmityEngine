@@ -3,6 +3,9 @@
 A lightweight 3D game engine written in C++23 with OpenGL
 
 ![CI](https://github.com/TheSlabby/AmityEngine/actions/workflows/cmake-tests.yml/badge.svg)
+[![Docs](https://img.shields.io/badge/docs-theslabby.github.io%2FAmityEngine-16a34a)](https://theslabby.github.io/AmityEngine/)
+
+📖 **[Read the documentation →](https://theslabby.github.io/AmityEngine/)**
 
 ---
 
