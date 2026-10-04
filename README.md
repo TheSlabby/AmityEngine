@@ -63,17 +63,41 @@ scene->addEntity(entity);
 
 ## Building
 
-**Dependencies**: OpenGL, GLFW, GLM, Assimp, OpenAL, libsndfile
+Dependencies (GLFW, GLM, Assimp, OpenAL, libsndfile, plus GoogleTest and Lua when enabled) are installed automatically by [vcpkg](https://vcpkg.io) from `vcpkg.json`.
+
+**One-time setup:** install vcpkg and set `VCPKG_ROOT` to its folder:
 
 ```bash
-cmake -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build
+git clone https://github.com/microsoft/vcpkg
+./vcpkg/bootstrap-vcpkg.bat        # or bootstrap-vcpkg.sh on Linux/macOS
+# then set the VCPKG_ROOT environment variable to that vcpkg folder
 ```
+
+**Configure and build** (Windows, Visual Studio 2022):
+
+```bash
+cmake --preset windows
+cmake --build build/windows --config Release
+cmake --build build/windows --config Debug --target Minecraft   # build a single target
+```
+
+The first configure builds every dependency, which takes a while; later configures reuse vcpkg's cache.
+
+**Options** (pass to the configure step, e.g. `cmake --preset windows -DAMITY_ENABLE_LUA=ON`):
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `AMITY_ENABLE_LUA` | `OFF` | Build LuaScriptService |
+| `AMITY_BUILD_TESTS` | `ON` | Build unit tests |
+| `AMITY_BUILD_DEMOS` | `ON` | Build demo games (Amity test game, PanTiltShowcase, StormySails) |
+| `AMITY_BUILD_PRIVATE_GAMES` | `ON` | Build games in `src/games/PrivateGames` if present |
+
+If vcpkg ever seems to ignore `vcpkg.json`, reconfigure with `--fresh`.
 
 **Run tests:**
 
 ```bash
-cd build && ctest -C Debug --output-on-failure
+ctest --test-dir build/windows -C Debug --output-on-failure
 ```
 
 ---

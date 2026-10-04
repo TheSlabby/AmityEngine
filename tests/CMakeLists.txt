@@ -1,18 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 
-include(FetchContent)
-
-# Declare GoogleTest dependency
-FetchContent_Declare(
-  googletest
-  URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
-)
-
-# Windows MSVC setting to avoid compiler warnings / CRT conflicts
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-
-# Make GoogleTest targets available
-FetchContent_MakeAvailable(googletest)
+# GoogleTest (from vcpkg "tests" feature)
+find_package(GTest REQUIRED)
 
 # Define the unit test executable
 add_executable(AmityTests
@@ -33,8 +22,8 @@ endif()
 # Link tests to the Core engine and GoogleTest libraries
 target_link_libraries(AmityTests PRIVATE
     AmityCore
-    gtest_main
-    gtest
+    GTest::gtest
+    GTest::gtest_main
 )
 
 # Register tests with CTest automatically

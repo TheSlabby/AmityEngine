@@ -1,0 +1,21 @@
+{
+  "name": "amityengine",
+  "version-string": "0.1.0",
+  "dependencies": [
+    "glfw3",
+    "glm",
+    "assimp",
+    "openal-soft",
+    "libsndfile"
+  ],
+  "features": {
+    "tests": {
+      "description": "Unit tests",
+      "dependencies": ["gtest"]
+    },
+    "lua": {
+      "description": "Lua scripting (LuaScriptService)",
+      "dependencies": ["lua"]
+    }
+  }
+}
