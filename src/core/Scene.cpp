@@ -1,4 +1,5 @@
 #include "Scene.hpp"
+#include "Log.hpp"
 #include "MeshComponent.hpp"
 #include <GLFW/glfw3.h>
 #include <algorithm>
@@ -71,8 +72,8 @@ void Scene::setupFramebuffer()
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthTexture, 0);
 
     // Check framebuffer completeness
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        std::cerr << "ERROR: Framebuffer not complete!" << std::endl;
+    if (GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER); status != GL_FRAMEBUFFER_COMPLETE)
+        Log::render().error("Post-process framebuffer incomplete (status 0x{:X}, size {}x{})", status, m_fboWidth, m_fboHeight);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 

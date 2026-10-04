@@ -34,6 +34,7 @@ find_package(glm REQUIRED)
 find_package(assimp REQUIRED)
 find_package(OpenAL REQUIRED)
 find_package(LibSndFile REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
 
 # Glad OpenGL Loader Library
 add_library(glad STATIC src/third_party/glad/glad.c)
@@ -47,6 +48,7 @@ endif()
 # Core Engine Static Library
 add_library(AmityCore STATIC
     src/core/Application.cpp
+    src/core/Log.cpp
     src/core/Shader.cpp
     src/core/ModelRenderable.cpp
     src/core/TerrainRenderable.cpp
@@ -71,6 +73,7 @@ target_link_libraries(AmityCore PUBLIC
     glad
     glm::glm
     assimp::assimp
+    spdlog::spdlog
     ${LIBSNDFILE_LIBRARIES}
 )
 

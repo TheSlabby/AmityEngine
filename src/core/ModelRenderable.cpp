@@ -2,6 +2,7 @@
 #include <filesystem>
 #include <algorithm>
 #include <iostream>
+#include "Log.hpp"
 
 // STB IMAGE
 #define STB_IMAGE_IMPLEMENTATION
@@ -69,7 +70,11 @@ unsigned int TextureFromMemory(const aiTexture* embeddedTexture)
         std::memcpy(data, embeddedTexture->pcData, width * height * 4);
     }
 
-    if (!data) return 0;
+    if (!data)
+    {
+        Log::render().warn("Failed to decode embedded texture: {}", stbi_failure_reason());
+        return 0;
+    }
 
     unsigned int textureID = CreateOpenGLTexture(data, width, height, nrComponents);
 
@@ -113,7 +118,11 @@ unsigned int TextureFromFile(const char* path, const std::string& directory)
     stbi_set_flip_vertically_on_load(true);
     int width, height, nrComponents;
     unsigned char* data = stbi_load(fullPath.c_str(), &width, &height, &nrComponents, 0);
-    if (!data) return 0;
+    if (!data)
+    {
+        Log::render().warn("Failed to load texture '{}': {}", fullPath, stbi_failure_reason());
+        return 0;
+    }
 
     unsigned int textureID = CreateOpenGLTexture(data, width, height, nrComponents);
     stbi_image_free(data);
@@ -183,11 +192,12 @@ void ModelRenderable::loadModel()
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
-        std::cerr << "ASSIMP ERROR: " << m_importer.GetErrorString() << std::endl;
+        Log::render().error("Failed to load model '{}': {}", m_config.modelPath, m_importer.GetErrorString());
         return;
     }
 
     processNode(scene->mRootNode, scene);
+    Log::render().debug("Loaded model '{}' ({} meshes, {} textures)", m_config.modelPath, meshes.size(), texturesLoaded.size());
 }
 
 void ModelRenderable::processNode(aiNode *node, const aiScene *scene)

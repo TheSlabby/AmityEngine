@@ -1,4 +1,5 @@
 #include "UIRenderer.hpp"
+#include "Log.hpp"
 #include "FontManager.hpp"
 #include "ResourceManager.hpp"
 #include <glad/glad.h>
@@ -65,7 +66,7 @@ void UIRenderer::Init(int width, int height)
     glBindVertexArray(0);
 
     s_initialized = true;
-    std::cout << "[UIRenderer] Initialized successfully. Resolution: " << width << "x" << height << std::endl;
+    Log::render().debug("UIRenderer initialized at {}x{}", width, height);
 }
 
 void UIRenderer::Shutdown()

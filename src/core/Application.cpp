@@ -1,6 +1,7 @@
 #include "Application.hpp"
 #include "UIRenderer.hpp"
 #include "ResourceManager.hpp"
+#include "Log.hpp"
 
 namespace Core {
 
@@ -8,7 +9,7 @@ Application::Application(int width, int height) : WIDTH(width), HEIGHT(height), 
 {
     if (!glfwInit())
     {
-        std::cerr << "Failed to initialize GLFW" << std::endl;
+        Log::core().critical("Failed to initialize GLFW");
     }
     
     m_startTime = glfwGetTime();
@@ -16,7 +17,7 @@ Application::Application(int width, int height) : WIDTH(width), HEIGHT(height), 
     m_window = glfwCreateWindow(WIDTH, HEIGHT, m_appName.c_str(), nullptr, nullptr);
     if (!m_window)
     {
-        std::cerr << "Couldn't create window :(" << std::endl;
+        Log::core().critical("Failed to create {}x{} window", WIDTH, HEIGHT);
         glfwTerminate();
         throw std::runtime_error("Failed to create GLFW window");
     }
@@ -29,15 +30,31 @@ Application::Application(int width, int height) : WIDTH(width), HEIGHT(height), 
 
     // openAL SETUP
     device = alcOpenDevice(nullptr);
-    if (!device) throw std::runtime_error("No audio device");
+    if (!device)
+    {
+        Log::audio().critical("No audio device found");
+        throw std::runtime_error("No audio device");
+    }
     context = alcCreateContext(device, nullptr);
-    if (!alcMakeContextCurrent(context)) throw std::runtime_error("Can't make device context current");
+    if (!alcMakeContextCurrent(context))
+    {
+        Log::audio().critical("Failed to make OpenAL context current");
+        throw std::runtime_error("Can't make device context current");
+    }
+    Log::audio().info("OpenAL device: {}", alcGetString(device, ALC_DEVICE_SPECIFIER));
 
 
     // glad init
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
-        std::cerr << "Failed to initialize GLAD" << std::endl;
+        Log::render().critical("Failed to initialize GLAD");
+    }
+    else
+    {
+        Log::render().info("OpenGL {} | {} | {}",
+            reinterpret_cast<const char*>(glGetString(GL_VERSION)),
+            reinterpret_cast<const char*>(glGetString(GL_RENDERER)),
+            reinterpret_cast<const char*>(glGetString(GL_VENDOR)));
     }
 
     glViewport(0, 0, WIDTH, HEIGHT);

@@ -1,4 +1,5 @@
 #include "Sound.hpp"
+#include "Log.hpp"
 
 namespace Core {
 
@@ -8,7 +9,7 @@ Sound::Sound(const std::string& path) {
 
     if (!sndfile)
     {
-        std::cerr << "SOUND ERROR: Couldn't load audio file: " << path << std::endl;
+        Log::audio().error("Failed to open audio file '{}': {}", path, sf_strerror(nullptr));
         m_valid = false;
     }
     else
@@ -35,7 +36,7 @@ bool Sound::setup(const std::vector<short>& audioData, int channels, int sampleR
         format = AL_FORMAT_STEREO16;
     else
     {
-        std::cerr << "unsupported num audio channels: " << channels << std::endl;
+        Log::audio().error("Unsupported audio channel count: {} (only mono/stereo)", channels);
         return false;
     }
 

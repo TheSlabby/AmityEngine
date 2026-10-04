@@ -1,4 +1,5 @@
 #include "Shader.hpp"
+#include "Log.hpp"
 #include <vector>
 
 namespace Core {
@@ -49,13 +50,13 @@ void Shader::setShader(const char* vertexPath, const char* fragmentPath) {
 		vertexCode = vShaderStream.str();
 		fragmentCode = fShaderStream.str();
 	}
-	catch (std::ifstream::failure e) {
-		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ at " << vertexPath << " or " << fragmentPath << std::endl;
+	catch (const std::ifstream::failure&) {
+		Log::render().error("Failed to read shader files '{}' / '{}'", vertexPath, fragmentPath);
 	}
 
 	// Prevent segmentation faults in headless environments (like unit tests running without an OpenGL context)
 	if (glCreateShader == nullptr) {
-		std::cout << "[SHADER] Headless environment detected. Skipping GPU compilation for: " << vertexPath << " and " << fragmentPath << std::endl;
+		Log::render().debug("No OpenGL context, skipping shader compilation for '{}' / '{}'", vertexPath, fragmentPath);
 		return;
 	}
 
@@ -74,7 +75,7 @@ void Shader::setShader(const char* vertexPath, const char* fragmentPath) {
 	glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
 	if (!success) {
 		glGetShaderInfoLog(vertex, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+		Log::render().error("Vertex shader '{}' failed to compile:\n{}", vertexPath, infoLog);
 	}
 
 	//fragment
@@ -85,10 +86,11 @@ void Shader::setShader(const char* vertexPath, const char* fragmentPath) {
 	glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
 	if (!success) {
 		glGetShaderInfoLog(fragment, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+		Log::render().error("Fragment shader '{}' failed to compile:\n{}", fragmentPath, infoLog);
 	}
 
 	//setup shader program
+	if (ID != 0) glDeleteProgram(ID);
 	ID = glCreateProgram();
 	glAttachShader(ID, vertex);
 	glAttachShader(ID, fragment);
@@ -97,7 +99,7 @@ void Shader::setShader(const char* vertexPath, const char* fragmentPath) {
 	glGetProgramiv(ID, GL_LINK_STATUS, &success);
 	if (!success) {
 		glGetProgramInfoLog(ID, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+		Log::render().error("Shader program '{}' + '{}' failed to link:\n{}", vertexPath, fragmentPath, infoLog);
 	}
 
 	//cleanup

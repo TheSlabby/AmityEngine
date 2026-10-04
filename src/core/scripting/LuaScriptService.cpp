@@ -4,6 +4,7 @@
 #include <RigidBodyComponent.hpp>
 #include <user_input/UserInputService.hpp>
 #include <iostream>
+#include <Log.hpp>
 #include <filesystem>
 
 namespace Core {
@@ -24,7 +25,7 @@ static int lua_SetPosition(lua_State* L)
     }
     else
     {
-        std::cerr << "[LUA ERROR] SetPosition: Entity '" << name << "' not found!" << std::endl;
+        Log::script().warn("SetPosition: entity '{}' not found", name);
     }
     return 0;
 }
@@ -43,7 +44,7 @@ static int lua_Translate(lua_State* L)
     }
     else
     {
-        std::cerr << "[LUA ERROR] Translate: Entity '" << name << "' not found!" << std::endl;
+        Log::script().warn("Translate: entity '{}' not found", name);
     }
     return 0;
 }
@@ -64,12 +65,12 @@ static int lua_SetVelocity(lua_State* L)
         }
         else
         {
-            std::cerr << "[LUA ERROR] SetVelocity: Entity '" << name << "' has no RigidBodyComponent!" << std::endl;
+            Log::script().warn("SetVelocity: entity '{}' has no RigidBodyComponent", name);
         }
     }
     else
     {
-        std::cerr << "[LUA ERROR] SetVelocity: Entity '" << name << "' not found!" << std::endl;
+        Log::script().warn("SetVelocity: entity '{}' not found", name);
     }
     return 0;
 }
@@ -101,7 +102,7 @@ void LuaScriptService::init(Scene* scene, UserInputService* inputService)
     m_luaState = luaL_newstate();
     if (!m_luaState)
     {
-        std::cerr << "[SCRIPT SERVICE] Failed to initialize Lua state!" << std::endl;
+        Log::script().error("Failed to create Lua state");
         return;
     }
 
@@ -122,7 +123,7 @@ void LuaScriptService::init(Scene* scene, UserInputService* inputService)
         });
     }
 
-    std::cout << "[SCRIPT SERVICE] Lua Scripting Engine initialized successfully!" << std::endl;
+    Log::script().info("Lua initialized ({})", LUA_RELEASE);
 
     // Bootstrap lightweight Lua OOP wrapper for clean entity-level variable syntax:
     // e.g., local ship = GetEntity("pirateShip"); ship:SetVelocity(0, 0, -10)
@@ -151,7 +152,7 @@ void LuaScriptService::shutdown()
 
         lua_close(m_luaState);
         m_luaState = nullptr;
-        std::cout << "[SCRIPT SERVICE] Lua Scripting Engine shut down cleanly." << std::endl;
+        Log::script().debug("Lua shut down");
     }
 }
 
@@ -159,14 +160,13 @@ void LuaScriptService::executeFile(const std::string& path)
 {
     if (!m_luaState)
     {
-        std::cerr << "[SCRIPT SERVICE] Cannot execute file: Lua is not initialized!" << std::endl;
+        Log::script().error("Cannot run '{}': Lua is not initialized", path);
         return;
     }
 
     if (luaL_dofile(m_luaState, path.c_str()) != LUA_OK)
     {
-        std::cerr << "[LUA RUNTIME ERROR] Failed to run file '" << path << "': " 
-                  << lua_tostring(m_luaState, -1) << std::endl;
+        Log::script().error("Error in '{}': {}", path, lua_tostring(m_luaState, -1));
         lua_pop(m_luaState, 1); // pop error
     }
 }
@@ -175,14 +175,13 @@ void LuaScriptService::executeString(const std::string& code)
 {
     if (!m_luaState)
     {
-        std::cerr << "[SCRIPT SERVICE] Cannot execute string: Lua is not initialized!" << std::endl;
+        Log::script().error("Cannot run code string: Lua is not initialized");
         return;
     }
 
     if (luaL_dostring(m_luaState, code.c_str()) != LUA_OK)
     {
-        std::cerr << "[LUA RUNTIME ERROR] Failed to run code string: " 
-                  << lua_tostring(m_luaState, -1) << std::endl;
+        Log::script().error("Error in code string: {}", lua_tostring(m_luaState, -1));
         lua_pop(m_luaState, 1); // pop error
     }
 }
@@ -221,8 +220,7 @@ void LuaScriptService::handleKeyPress(int keycode)
         // Call Lua function (1 argument, 0 return values, no error handler)
         if (lua_pcall(m_luaState, 1, 0, 0) != LUA_OK)
         {
-            std::cerr << "[LUA EVENT ERROR] keypress callback error: " 
-                      << lua_tostring(m_luaState, -1) << std::endl;
+            Log::script().error("Error in key press callback: {}", lua_tostring(m_luaState, -1));
             lua_pop(m_luaState, 1); // pop error
         }
     }

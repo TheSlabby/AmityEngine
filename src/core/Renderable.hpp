@@ -31,7 +31,7 @@ struct Texture
 class Renderable
 {
 public:
-    Renderable(std::shared_ptr<Shader> shader) : m_shader(shader) { m_shader->setMat4("u_Model", m_model); }
+    Renderable(std::shared_ptr<Shader> shader) : m_shader(shader) {}
     virtual ~Renderable() = default;
     virtual void render(const Scene& scene, double dt) = 0;
 

@@ -6,7 +6,8 @@
     "glm",
     "assimp",
     "openal-soft",
-    "libsndfile"
+    "libsndfile",
+    "spdlog"
   ],
   "features": {
     "tests": {
